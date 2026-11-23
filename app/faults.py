@@ -13,4 +13,11 @@ REASONS = {
     'LOT_UNKNOWN':'颜料别名未登记', 'LOT_CONFLICT':'别名关联多个批号', 'MIXED_OUTPUT':'混料动作不得指定单一批号',
     'OVERDRAW':'净重超过罐内存量', 'CLAIM_CONFLICT':'同批申报值冲突', 'NO_CLAIM':'无回桶申报',
     'MISMATCH':'回桶差异', 'MATCH':'账实一致', 'ACCEPTED':'已采信',
+    'BAD_MONEY':'金额格式错误', 'BAD_CURRENCY':'币种不支持',
+    'INVOICE_TOTAL_CONFLICT':'同发票实付总额冲突', 'INVOICE_LOT_DUPLICATE':'同发票批号重复',
+    'INVOICE_LOT_UNKNOWN':'发票批号不在工单', 'INVOICE_LOT_MISSING':'工单批号缺发票原价',
+    'INVOICE_LIST_INVALID':'原价合计无效', 'INVOICE_PAID_INVALID':'实付金额无效',
+    'INVOICE_EMPTY':'发票没有可入账行', 'INVOICE_INVALID':'发票原件无效',
+    'SETTLEMENT_UNBALANCED':'入账金额无法轧平', 'SETTLEMENT_DUPLICATE':'发票已入账，禁止重复',
+    'SETTLEMENT_BOOK':'留档工单与发票不匹配', 'SETTLEMENT_ABSENT':'找不到该发票入账',
 }

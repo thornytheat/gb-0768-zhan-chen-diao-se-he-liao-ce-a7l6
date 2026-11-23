@@ -9,6 +9,7 @@ COLUMNS = {
     'tares': 'container,version,start,end,mass,unit',
     'lots': 'alias,lot,pigment',
     'claims': 'lot,mass,unit,receipt',
+    'invoice': 'invoice,lot,list_currency,list_amount,paid_currency,paid_amount',
 }
 ACTIONS = ('OPEN','ISSUE','APPLY','LOSS','RETURN')
 

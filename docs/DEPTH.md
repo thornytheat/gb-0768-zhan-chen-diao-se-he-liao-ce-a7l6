@@ -14,6 +14,7 @@
 | M5 库存与损耗对账 | 按批号核对存量、损耗与回桶申报 | `GET /api/trial/dirty/balance` | `app/blend/balance.py` `app/blend/claims.py` | `tests/test_balance.py` |
 | M6 批次留档复跑 | 封存工单及重跑 | `POST /api/books` | `app/ledger/bookshelf.py` `app/ledger/closeout.py` | `tests/test_history.py` |
 | M7 收据证据签发 | 签发可独立复核的成分收据 | `GET /api/export/{key}` | `app/ledger/signoff.py` | `tests/test_receipt.py` |
+| M8 发票折扣入账 | 原价/实付对账，折扣摊到上件损耗回桶留罐 | `POST /api/settlements` | `app/blend/invoice.py` `app/blend/money.py` `app/ledger/settlement.py` | `tests/test_invoice.py` `tests/test_settlement.py` |
 
 ## 陷阱登记
 
@@ -30,12 +31,16 @@
 | TRAP-15 | g、kg、mg 混用 | 净重差几个数量级 | 转整数毫克 | `app/receipts/units.py` | `tests/test_tares.py::test_mass_units` |
 | TRAP-24 | 等余数 | 尾差归属漂移 | 余数相同按批号 | `app/blend/share.py` | `tests/test_recovery.py::test_exact_rounding_residue` |
 | TRAP-25 | 两种皮重同时生效 | 误取第一或最后版本 | 双版本保留且隔离 | `app/receipts/tare.py` | `tests/test_tares.py::test_overlapping_tare_versions` |
+| TRAP-30 | 金额浮点舍入 | 入账合计与实付差几分 | 整数分 + 最大余数尾差 | `app/blend/money.py` `app/blend/invoice.py` | `tests/test_invoice.py::test_rounding_residue_is_deterministic_and_balances` |
+| TRAP-31 | 折扣全抵本期 | 余料被高估为原价 | 折扣按原价占比惠及回桶留罐 | `app/blend/invoice.py` | `tests/test_invoice.py::test_residual_material_carries_discount_not_fully_expensed` |
+| TRAP-32 | 发票重复入账 | 同一发票两次进账 | 发票编号原子硬链接唯一 | `app/ledger/settlement.py` | `tests/test_settlement.py::test_same_invoice_is_never_posted_twice` |
 
 ## 对账规则
 
 - 秤单 40 = 入册 34 + 隔离 5 + 重复表头 1。后续 3 张皮重隔离、2 张批号隔离、1 张超量，回放 28 张。
 - 每批号期初 + 领用 = 上件 + 损耗 + 回桶余料 + 争议留罐，实收与申报差异另外对照。
-- 规则版本与全原件的 SHA-256 构成工单留档键；同目录临时文件写入并同步后，以原子硬链接发布。
+- 发票每批原价－折扣＝净价；上件、损耗、回桶、留罐四项入账金额之和等于净价，全部批次合计等于实付，尾差按最大余数补齐。
+- 规则版本与全原件的 SHA-256 构成工单留档键；同目录临时文件写入并同步后，以原子硬链接发布。发票入账册按发票编号同样原子发布，失败不留半份账。
 
 ## 已知边界
 

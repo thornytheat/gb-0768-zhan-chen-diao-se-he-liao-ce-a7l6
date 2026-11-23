@@ -1,0 +1,4 @@
+invoice,lot,list_currency,list_amount,paid_currency,paid_amount
+INV-2200,R-017,CNY,1500.00,CNY,3060.00
+INV-2200,W-041,CNY,1200.00,CNY,3060.00
+INV-2200,B-003,CNY,900.00,CNY,3060.00

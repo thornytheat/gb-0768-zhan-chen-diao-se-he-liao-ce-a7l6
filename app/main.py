@@ -6,6 +6,7 @@ from flask import Flask,jsonify
 from app.api import api
 from app.faults import LedgerError
 from app.ledger.bookshelf import Bookshelf
+from app.ledger.settlement import SettlementShelf
 from app.web import pages
 
 
@@ -14,6 +15,8 @@ def create_app(path=None):
     service.jinja_env.autoescape=True
     service.config['MAX_CONTENT_LENGTH']=5*1024*1024
     service.extensions['receipt_bookshelf']=Bookshelf(Path(path or os.getenv('PALETTE_SHELF','var/receipts')))
+    root=Path(path) if path else Path(os.getenv('PALETTE_SHELF','var/receipts')).parent
+    service.extensions['settlement_shelf']=SettlementShelf(root/'settlements')
     service.register_blueprint(api)
     service.register_blueprint(pages)
 

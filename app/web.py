@@ -1,16 +1,17 @@
 from flask import Blueprint,render_template,request
 
-from app.api import bookshelf
+from app.api import bookshelf, settlements as settlement_shelf
 from app.faults import LedgerError,REASONS
 from app.job import MixingJob
 from app.ledger.signoff import certify
 from app.receipts.clock import studio_label
 from app.receipts.packet import read_sample
 from app.receipts.units import grams
-from app.settings import EDITION
+from app.settings import DATA, EDITION
+from app.blend.money import yuan
 
 LINKS={'weighings':'称量原件','tares':'容器皮重','lots':'颜料批号','recovery':'回桶分料',
-       'balance':'库存核料','history':'工单留档','receipt':'证据签发'}
+       'balance':'库存核料','settlement':'发票入账','history':'工单留档','receipt':'证据签发'}
 ACTIONS={'OPEN':'期初','ISSUE':'领用','APPLY':'上件','LOSS':'损耗','RETURN':'回桶'}
 pages=Blueprint('studio',__name__)
 
@@ -33,6 +34,8 @@ def desk(screen='overview'):
         job=MixingJob(read_sample(sample))
         data,meta=job.snapshot(),{'order':job.job.order,'edition':EDITION,'cutoff':job.job.cutoff.isoformat()}
     history=bookshelf().listing() if screen=='history' else []
+    ledger=settlement_shelf().listing() if screen=='settlement' else []
+    sample_invoice=(DATA/sample/'invoice.csv').read_text() if screen=='settlement' else ''
     rejects=[]
     if screen=='weighings':
         rejects=data[screen]['isolated']+[row for item in data[screen]['sheets'] for row in item['isolated']]
@@ -45,5 +48,6 @@ def desk(screen='overview'):
     if screen=='balance':
         rejects=data[screen]['invalid_receipts']
     return render_template('base.html',screen=screen,links=LINKS,sample=sample,key=key,data=data,meta=meta,
-                           receipt=receipt,history=history,labels=REASONS,actions=ACTIONS,grams=grams,
+                           receipt=receipt,history=history,ledger=ledger,sample_invoice=sample_invoice,yuan=yuan,
+                           labels=REASONS,actions=ACTIONS,grams=grams,
                            studio_label=studio_label,rejects=rejects)

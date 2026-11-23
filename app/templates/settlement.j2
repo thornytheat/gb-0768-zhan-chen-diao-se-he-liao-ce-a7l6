@@ -1,0 +1,20 @@
+<section class="panel folio"><h2>发票整单折扣入账</h2>
+<p class="hint">整单折扣按各批原价占比摊到批次，再按上件、损耗、回桶、留罐的实称分料摊分；尾差按余数补齐，四项入账金额合计须恰好等于实付。</p>
+{% if not key %}<p class="hint">先在上方「封存工单」生成留档号，再提交发票入账。</p>{% endif %}
+<form id="settle-form" class="settle-box">
+  <input type="hidden" name="key" value="{{ key or '' }}">
+  <label>发票原件（UTF-8 文本）
+    <textarea name="invoice" rows="8" spellcheck="false" placeholder="invoice,lot,list_currency,list_amount,paid_currency,paid_amount">{{ sample_invoice }}</textarea>
+  </label>
+  <button type="submit" {% if not key %}disabled{% endif %}>结算入账</button>
+</form>
+<p id="settle-feedback" role="status" hidden></p>
+<div id="settle-result" class="scroll" hidden></div>
+</section>
+<section class="panel folio"><h2>已入账发票</h2>
+<div class="scroll"><table><thead><tr><th>发票</th><th>工单</th><th>原价 ¥</th><th>折扣 ¥</th><th>实付 ¥</th><th>入账 ¥</th><th>留档</th></tr></thead><tbody>
+{% for row in ledger %}<tr><th scope="row">{{ row.invoice }}</th><td>{{ row.order }}</td>
+<td>{{ yuan(row.report.list_total_cents) }}</td><td>{{ yuan(row.report.discount_total_cents) }}</td>
+<td>{{ yuan(row.report.paid_cents) }}</td><td>{{ yuan(row.report.entry_total_cents) }}</td>
+<td><a href="{{ url_for('studio.desk',screen='receipt',key=row.book_key) }}">{{ row.book_key[:12] }}</a></td></tr>
+{% else %}<tr><td colspan="7">尚无发票入账。</td></tr>{% endfor %}</tbody></table></div></section>
